@@ -1,0 +1,95 @@
+// Copyright (C) 2024-2025 Guyutongxue
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+// 
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+syntax = "proto3";
+option csharp_namespace = "GiTcg.Proto";
+
+// 描述骰子费用的骰子类型
+enum DiceRequirementType {
+  DICE_REQUIREMENT_TYPE_VOID = 0;
+  DICE_REQUIREMENT_TYPE_CRYO = 1;
+  DICE_REQUIREMENT_TYPE_HYDRO = 2;
+  DICE_REQUIREMENT_TYPE_PYRO = 3;
+  DICE_REQUIREMENT_TYPE_ELECTRO = 4;
+  DICE_REQUIREMENT_TYPE_ANEMO = 5;
+  DICE_REQUIREMENT_TYPE_GEO = 6;
+  DICE_REQUIREMENT_TYPE_DENDRO = 7;
+  DICE_REQUIREMENT_TYPE_ALIGNED = 8;
+  DICE_REQUIREMENT_TYPE_ENERGY = 9;
+  DICE_REQUIREMENT_TYPE_LEGEND = 10;
+}
+
+// 骰子费用 entry，以此为元素的集合构成骰子费用需求
+message DiceRequirement {
+  DiceRequirementType type = 1;
+  int32 count = 2;
+}
+
+// 实际骰子类型
+enum DiceType {
+  DICE_TYPE_UNSPECIFIED = 0;
+  DICE_TYPE_CRYO = 1;
+  DICE_TYPE_HYDRO = 2;
+  DICE_TYPE_PYRO = 3;
+  DICE_TYPE_ELECTRO = 4;
+  DICE_TYPE_ANEMO = 5;
+  DICE_TYPE_GEO = 6;
+  DICE_TYPE_DENDRO = 7;
+  DICE_TYPE_OMNI = 8;
+}
+
+enum DamageType {
+  DAMAGE_TYPE_PHYSICAL = 0;
+  DAMAGE_TYPE_CRYO = 1;
+  DAMAGE_TYPE_HYDRO = 2;
+  DAMAGE_TYPE_PYRO = 3;
+  DAMAGE_TYPE_ELECTRO = 4;
+  DAMAGE_TYPE_ANEMO = 5;
+  DAMAGE_TYPE_GEO = 6;
+  DAMAGE_TYPE_DENDRO = 7;
+  DAMAGE_TYPE_PIERCING = 8;
+  DAMAGE_TYPE_HEAL = 9;
+}
+
+enum AuraType {
+  AURA_TYPE_NONE = 0;
+  AURA_TYPE_CRYO = 1;
+  AURA_TYPE_HYDRO = 2;
+  AURA_TYPE_PYRO = 3;
+  AURA_TYPE_ELECTRO = 4;
+  AURA_TYPE_DENDRO = 7;
+  AURA_TYPE_CRYO_DENDRO = 0x71; // (AURA_DENDRO << 4) | AURA_CRYO
+}
+
+enum ReactionType {
+  REACTION_TYPE_UNSPECIFIED = 0;
+  REACTION_TYPE_MELT = 101;
+  REACTION_TYPE_VAPORIZE = 102;
+  REACTION_TYPE_OVERLOADED = 103;
+  REACTION_TYPE_SUPERCONDUCT = 104;
+  REACTION_TYPE_ELECTRO_CHARGED = 105;
+  REACTION_TYPE_FROZEN = 106;
+  REACTION_TYPE_SWIRL_CRYO = 107;
+  REACTION_TYPE_SWIRL_HYDRO = 108;
+  REACTION_TYPE_SWIRL_PYRO = 109;
+  REACTION_TYPE_SWIRL_ELECTRO = 110;
+  REACTION_TYPE_CRYSTALLIZE_CRYO = 111;
+  REACTION_TYPE_CRYSTALLIZE_HYDRO = 112;
+  REACTION_TYPE_CRYSTALLIZE_PYRO = 113;
+  REACTION_TYPE_CRYSTALLIZE_ELECTRO = 114;
+  REACTION_TYPE_BURNING = 115;
+  REACTION_TYPE_BLOOM = 116;
+  REACTION_TYPE_QUICKEN = 117;
+}

@@ -1,0 +1,286 @@
+// Copyright (C) 2024-2025 Guyutongxue
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+// 
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+syntax = "proto3";
+option csharp_namespace = "GiTcg.Proto";
+
+import "enums.proto";
+import "state.proto";
+
+message ExposedMutation {
+  oneof mutation {
+    ChangePhaseEM change_phase = 1;
+    StepRoundEM step_round = 2;
+    SwitchTurnEM switch_turn = 3;
+    SetWinnerEM set_winner = 4;
+    // reserved: transfer_card 5
+    SwitchActiveEM switch_active = 6;
+    // reserved: remove_card 7
+    // reserved: create_card 8
+    CreateCharacterEM create_character = 9;
+    CreateEntityEM create_entity = 10;
+    RemoveEntityEM remove_entity = 11;
+    ModifyEntityVarEM modify_entity_var = 12;
+    TransformDefinitionEM transform_definition = 13;
+    ResetDiceEM reset_dice = 14;
+    DamageEM damage = 15;
+    ApplyAuraEM apply_aura = 16;
+    SkillUsedEM skill_used = 18;
+    PlayerStatusChangeEM player_status_change = 19;
+    SwapCharacterPositionEM swap_character_position = 20;
+    SetPlayerFlagEM set_player_flag = 21;
+    RerollDoneEM reroll_done = 22;
+    SwitchHandsDoneEM switch_hands_done = 23;
+    ChooseActiveDoneEM choose_active_done = 24;
+    // reserved: Action 25
+    SelectCardDoneEM select_card_done = 26;
+    HandleEventEM handle_event = 27;
+    MoveEntityEM move_entity = 28;
+  }
+  reserved 17;
+}
+
+message ChangePhaseEM {
+  PhaseType new_phase = 1;
+}
+
+message StepRoundEM { }
+
+message SwitchTurnEM { }
+
+message SetWinnerEM {
+  optional int32 winner = 1;
+}
+
+enum SwitchActiveFromAction {
+  SWITCH_ACTIVE_FROM_ACTION_NONE = 0;
+  SWITCH_ACTIVE_FROM_ACTION_SLOW = 1;
+  SWITCH_ACTIVE_FROM_ACTION_FAST = 2;
+}
+
+message SwitchActiveEM {
+  int32 who = 1;
+  sint32 character_id = 2;
+  int32 character_definition_id = 3;
+  optional int32 via_skill_definition_id = 4;
+  SwitchActiveFromAction from_action = 5;
+}
+
+message CreateCharacterEM {
+  int32 who = 1;
+  reserved 2, 3;
+  CharacterState character = 4;
+}
+
+enum EntityArea {
+  ENTITY_AREA_UNSPECIFIED = 0;
+  ENTITY_AREA_CHARACTER = 1;
+  ENTITY_AREA_COMBAT_STATUS = 2;
+  ENTITY_AREA_SUMMON = 3;
+  ENTITY_AREA_SUPPORT = 4;
+  ENTITY_AREA_HAND = 5;
+  ENTITY_AREA_PILE = 6;
+}
+
+message CreateEntityEM {
+  int32 who = 1;
+  reserved 2, 3;
+  EntityArea where = 4;
+  EntityState entity = 5;
+  optional sint32 master_character_id = 6;
+}
+
+enum MoveEntityReason {
+  MOVE_ENTITY_REASON_UNSPECIFIED = 0;
+  MOVE_ENTITY_REASON_SWITCH = 1;
+  MOVE_ENTITY_REASON_DRAW = 2;
+  MOVE_ENTITY_REASON_UNDRAW = 3;
+  MOVE_ENTITY_REASON_STEAL = 4;
+  MOVE_ENTITY_REASON_SWAP = 5;
+  MOVE_ENTITY_REASON_EQUIP = 6;
+  MOVE_ENTITY_REASON_CREATE_SUPPORT = 7;
+  MOVE_ENTITY_REASON_UNEQUIP = 8;
+  MOVE_ENTITY_REASON_UNSUPPORT = 9;
+}
+
+message MoveEntityEM {
+  int32 from_who = 1;
+  reserved 2, 3;
+  EntityArea from_where = 4;
+  int32 to_who = 5;
+  EntityArea to_where = 6;
+  optional int32 target_index = 7;
+  EntityState entity = 8;
+  MoveEntityReason reason = 9;
+}
+
+enum RemoveEntityReason {
+  REMOVE_ENTITY_REASON_UNSPECIFIED = 0;
+  REMOVE_ENTITY_REASON_EVENT_CARD_PLAYED = 1;
+  REMOVE_ENTITY_REASON_ELEMENTAL_TUNING = 2;
+  REMOVE_ENTITY_REASON_OVERFLOW = 3;
+  REMOVE_ENTITY_REASON_CARD_DISPOSED = 4;
+  REMOVE_ENTITY_REASON_EVENT_CARD_PLAY_NO_EFFECT = 5;
+  REMOVE_ENTITY_REASON_EVENT_CARD_DRAWN = 6;
+}
+
+message RemoveEntityEM {
+  int32 who = 1;
+  reserved 2, 3;
+  EntityState entity = 4;
+  EntityArea where = 5;
+  RemoveEntityReason reason = 6;
+}
+
+enum ModifyDirection {
+  MODIFY_DIRECTION_UNSPECIFIED = 0;
+  MODIFY_DIRECTION_INCREASE = 1;
+  MODIFY_DIRECTION_DECREASE = 2;
+}
+
+message ModifyEntityVarEM {
+  sint32 entity_id = 2;
+  int32 entity_definition_id = 3;
+  string variable_name = 4;
+  int32 variable_value = 5;
+  ModifyDirection direction = 6;
+}
+
+message TransformDefinitionEM {
+  sint32 entity_id = 2;
+  int32 new_entity_definition_id = 3;
+}
+
+enum ResetDiceReason {
+  RESET_DICE_REASON_UNSPECIFIED = 0;
+  RESET_DICE_REASON_ROLL = 1;
+  RESET_DICE_REASON_CONSUME = 2;
+  RESET_DICE_REASON_ELEMENTAL_TUNING = 3;
+  RESET_DICE_REASON_GENERATE = 4;
+  RESET_DICE_REASON_CONVERT = 5;
+  RESET_DICE_REASON_ABSORB = 6;
+}
+
+message ResetDiceEM {
+  int32 who = 1;
+  repeated DiceType dice = 2;
+  ResetDiceReason reason = 3;
+  optional DiceType conversion_target_hint = 4;
+}
+
+enum HealKind {
+  HEAL_KIND_NOT_A_HEAL = 0;
+  HEAL_KIND_COMMON = 1;
+  HEAL_KIND_IMMUNE_DEFEATED = 2;
+  HEAL_KIND_REVIVE = 3;
+  HEAL_KIND_INCREASE_MAX_HEALTH = 4;
+  HEAL_KIND_DISTRIBUTION = 5;
+}
+
+message DamageEM {
+  DamageType damage_type = 1;
+  int32 value = 2;
+  sint32 target_id = 3;
+  int32 target_definition_id = 4;
+  sint32 source_id = 5;
+  int32 source_definition_id = 6;
+  bool is_skill_main_damage = 7;
+  ReactionType reaction_type = 8;
+  bool cause_defeated = 9;
+  AuraType old_aura = 10;
+  AuraType new_aura = 11;
+  int32 old_health = 12;
+  int32 new_health = 13;
+  HealKind heal_kind = 14;
+}
+
+message ApplyAuraEM {
+  DamageType element_type = 1;
+  sint32 target_id = 3;
+  int32 target_definition_id = 4;
+  ReactionType reaction_type = 8;
+  AuraType old_aura = 10;
+  AuraType new_aura = 11;
+}
+
+enum SkillType {
+  SKILL_TYPE_TRIGGERED = 0;
+  SKILL_TYPE_CHARACTER_PASSIVE = 1;
+  SKILL_TYPE_NORMAL = 2;
+  SKILL_TYPE_ELEMENTAL = 3;
+  SKILL_TYPE_BURST = 4;
+  SKILL_TYPE_TECHNIQUE = 5;
+}
+
+// 使用或触发了技能
+message SkillUsedEM {
+  sint32 caller_id = 1;
+  int32 caller_definition_id = 2;
+  int32 skill_definition_id = 3;
+  SkillType skill_type = 4;
+  int32 who = 5;
+  optional string triggered_on = 6;
+}
+
+message PlayerStatusChangeEM {
+  int32 who = 1;
+  PlayerStatus status = 2;
+}
+
+message SwapCharacterPositionEM {
+  int32 who = 1;
+  sint32 character_0_id = 2;
+  int32 character_0_definition_id = 3;
+  sint32 character_1_id = 4;
+  int32 character_1_definition_id = 5;
+}
+
+enum PlayerFlag {
+  PLAYER_FLAG_UNSPECIFIED = 0;
+  PLAYER_FLAG_DECLARED_END = 1;
+  PLAYER_FLAG_LEGEND_USED = 2;
+}
+
+message SetPlayerFlagEM {
+  int32 who = 1;
+  PlayerFlag flag_name = 2;
+  bool flag_value = 3;
+}
+
+message RerollDoneEM {
+  int32 who = 1;
+  uint32 count = 2;
+}
+
+message ChooseActiveDoneEM {
+  int32 who = 1;
+  sint32 character_id = 2;
+  int32 character_definition_id = 3;
+}
+
+message SwitchHandsDoneEM {
+  int32 who = 1;
+  uint32 count = 2;
+}
+
+message SelectCardDoneEM {
+  int32 who = 1;
+  int32 selected_definition_id = 2;
+}
+
+message HandleEventEM {
+  bool is_close = 1;
+  string event_name = 2;
+}

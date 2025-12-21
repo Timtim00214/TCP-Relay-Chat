@@ -1,0 +1,57 @@
+// Copyright (C) 2024-2025 Guyutongxue
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+// 
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+syntax = "proto3";
+option csharp_namespace = "GiTcg.Proto";
+
+import "enums.proto";
+
+// 切换出战角色
+message SwitchActiveAction {
+  // 出站角色 id
+  sint32 character_id = 2;
+  uint32 character_definition_id = 3;
+}
+
+// 打出手牌
+message PlayCardAction {
+  // 手牌 id
+  sint32 card_id = 2;
+  uint32 card_definition_id = 5;
+  // 打出手牌目标 id 列表
+  repeated sint32 target_ids = 3;
+  bool will_be_effectless = 4;
+}
+
+// 使用技能
+message UseSkillAction {
+  // 技能定义 id
+  int32 skill_definition_id = 2;
+  // 使用技能目标 id 列表
+  repeated sint32 target_ids = 3;
+  optional sint32 main_damage_target_id = 4;
+}
+
+// 元素调和
+message ElementalTuningAction {
+  // 要调和的手牌 id
+  sint32 removed_card_id = 2;
+  // 调和目标骰子类型
+  DiceType target_dice = 3;
+}
+
+// 宣布结束
+message DeclareEndAction {
+}
