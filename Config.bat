@@ -1,5 +1,7 @@
 @echo off
-color 0A
+:: 切换控制台为 UTF-8 编码，解决乱码问题
+chcp 65001 >nul
+
 setlocal
 
 :: ==========================================
@@ -9,62 +11,58 @@ set "GITHUB_URL=https://github.com/Timtim00214/TCP-Relay-Chat.git"
 set "GITEE_URL=https://gitee.com/Tim7im/tcp-relay-chat.git"
 :: ==========================================
 
-echo [Info] 开始执行初始化配置...
+echo [Info] 正在启动修复版配置脚本...
 echo.
 
-:: 1. 清理旧的 .git (加个判断防止误删)
+:: 1. 暴力清理旧配置 (防止 "remote exists" 报错)
+:: 如果 .git 存在，先移除旧的 remote，确保环境干净
 if exist .git (
-    echo [Warning] 检测到旧的 .git 目录。
-    choice /M "是否删除旧配置并重新初始化？(不可逆)"
-    if errorlevel 2 goto :skip_delete
-    
-    echo [Step 1/6] 正在清除旧 .git...
-    rmdir /s /q .git
+    echo [Step 1/5] 清理旧的远程连接...
+    git remote remove origin >nul 2>&1
+    git remote remove gitee >nul 2>&1
+) else (
+    echo [Step 1/5] 初始化新仓库...
+    git init >nul
 )
-:skip_delete
 
-:: 2. 初始化
-echo [Step 2/6] 初始化 Git...
-git init
-
-:: 3. 强制分支名为 main (解决 master/main 命名问题)
-echo [Step 3/6] 强制统一分支名为 main...
+:: 2. 强制分支名为 main
+echo [Step 2/5] 锁定分支为 main...
 git branch -M main
 
-:: 4. 配置远程仓库 (沿用 origin 和 gitee 双 remote 策略)
-echo [Step 4/6] 挂载远程仓库...
+:: 3. 挂载远程仓库 (先删后加)
+echo [Step 3/5] 挂载远程仓库...
 git remote add origin %GITHUB_URL%
 git remote add gitee %GITEE_URL%
 
-:: 5. 暴力合并远程历史 (解决 "远程与本地冲突" 问题)
-:: 逻辑：先尝试把 GitHub 上的 README/LICENSE 拉下来合并
-echo [Step 5/6] 尝试拉取远程文件并暴力合并...
+:: 4. 暴力合并 (解决 "unrelated histories")
+echo [Step 4/5] 同步云端历史 (自动处理冲突)...
+:: 尝试拉取，如果仓库为空会报错，但不影响后续
 git pull origin main --allow-unrelated-histories --no-rebase >nul 2>&1
-if %errorlevel% equ 0 (
-    echo [Success] 远程历史已合并。
-) else (
-    echo [Info] 拉取失败或仓库为空，跳过合并，准备直接覆盖。
-)
 
-:: 6. 首次提交并设置追踪
-echo [Step 6/6] 提交并设置 Upstream...
+:: 5. 提交并双端推送
+echo [Step 5/5] 执行首次双端推送...
 git add .
-git commit -m "Initial config by Tim-Script" >nul 2>&1
+git commit -m "Config Fix and Init" >nul 2>&1
 
-:: 推送到 GitHub 并绑定默认分支
 echo 正在推送到 GitHub...
 git push -u origin main
-if %errorlevel% neq 0 echo [Error] GitHub 推送失败，请检查网络。
+if %errorlevel% neq 0 (
+    echo [Warning] GitHub 推送遇到问题 (可能是网络原因)，请稍后重试。
+) else (
+    echo [Success] GitHub 完成。
+)
 
-:: 推送到 Gitee 并绑定默认分支
 echo 正在推送到 Gitee...
 git push -u gitee main
-if %errorlevel% neq 0 echo [Error] Gitee 推送失败，请检查密码。
+if %errorlevel% neq 0 (
+    echo [Warning] Gitee 推送遇到问题，请检查密码。
+) else (
+    echo [Success] Gitee 完成。
+)
 
 echo.
 echo ==========================================
-echo [Success] 初始化配置完毕！
-echo 分支已锁定为: main
-echo 双端已绑定，后续请直接使用 Push.bat
+echo [Success] 修复与配置完成！
+echo 乱码问题已解决，远程连接已重置。
 echo ==========================================
 pause
